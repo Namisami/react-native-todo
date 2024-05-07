@@ -1,118 +1,63 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
-import React from 'react';
-import type {PropsWithChildren} from 'react';
+import React, { useState } from 'react';
 import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
+    StyleSheet,
+    View,
+    Text,
+    Image,
+    ScrollView,
+    TextInput,
+    Button,
+    FlatList,
 } from 'react-native';
+import Task from './components/Task'
+// Стартовое значение списка задач
+const tasksInitial = [
+    { text: "Сделать первую лабу" },
+    { text: `Здесь очень много текстаЗдесь очень много текстаЗдесь очень много текста
+    Здесь очень много текстаЗдесь очень много текстаЗдесь очень много текста` },
+]
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
-
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
-
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
-
-function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-
-  return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
+const App = () => {
+    // Объявление состояния списка задач
+    const [tasks, setTasks] = useState(tasksInitial)
+    // Функция добавления задачи (пока статика)
+    const addTask = () => {
+        setTasks([...tasks, { text: "Сделать первую лабу" }])
+    }
+    // Первый View общий, второй для хедера
+    // ScrollView для прокручиваемого списка задач
+    // FlatList непосредственно для рендера списка задач
+    return (
+        <View style={ styles.container }>
+            <View>
+                <Button
+                    title="Создать"
+                    onPress={ addTask }
+                />
+            </View>
+            <ScrollView style={ styles.taskList }>
+                <FlatList
+                    contentContainerStyle={{ gap: 8 }}
+                    data={ tasks }
+                    renderItem={({item}) => (
+                        <Task>
+                            { item.text }
+                        </Task>
+                    )}
+                />
+            </ScrollView>
         </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
-}
+    );
+};
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
+    container: {
+        marginHorizontal: 16,
+        marginVertical: 8,
+    },
+    taskList: {
+        marginTop: 16,
+    }
 });
 
 export default App;
