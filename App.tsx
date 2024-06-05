@@ -35,16 +35,10 @@ const App = () => {
                     onPress={ addTask }
                 />
             </View>
-            <ScrollView style={ styles.taskList }>
-                <FlatList
-                    contentContainerStyle={{ gap: 8 }}
-                    data={ tasks }
-                    renderItem={({item}) => (
-                        <Task>
-                            { item.text }
-                        </Task>
-                    )}
-                />
+            <ScrollView style={ styles.taskList } contentContainerStyle={{ gap: 8 }}>
+                {
+                    tasks.map((item, index) => <Task key={ index }>{ item.text }</Task>)
+                }
             </ScrollView>
         </View>
     );

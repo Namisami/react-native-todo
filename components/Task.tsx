@@ -6,7 +6,8 @@ import {
     View,
     Text,
 } from 'react-native';
-import CheckBox from 'expo-checkbox';
+// import CheckBox from 'expo-checkbox';
+import CheckBox from '@react-native-community/checkbox';
 
 interface TaskProps {
     children: ReactNode
@@ -28,10 +29,10 @@ const Task = ({
     return (
         <View>
             <Pressable style={ styles.task } onPress={ toggleCheck }>
-                <CheckBox
-                    value={ isChecked }
-                    onValueChange={ toggleCheck }
-                />
+                 <CheckBox
+                     value={ isChecked }
+                     onValueChange={ toggleCheck }
+                 />
                 <Text style={ isChecked ? styles.taskTextCrossed : '' }>
                    { children }
                 </Text>
