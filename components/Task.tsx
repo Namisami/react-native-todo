@@ -1,40 +1,55 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
-    TouchableOpacity,
     Pressable,
     StyleSheet,
     View,
     Text,
 } from 'react-native';
-// import CheckBox from 'expo-checkbox';
 import CheckBox from '@react-native-community/checkbox';
 
+
 interface TaskProps {
-    children: ReactNode
+    id: number
+    text: string
+    isCompleted: boolean
+    onTaskClick: (id: number) => void
+    onTaskOpen: (id: number) => void
 }
+
+export interface TaskI {
+    id: number,
+    text: string,
+    completed: boolean,
+    userId: number,
+}
+
 // Компонент отдельной задачи
 const Task = ({
-    children
-}) => {
-    // Состояние (выполнено ли)
-    const [isChecked, setIsChecked] = useState(false);
+    id,
+    text,
+    isCompleted,
+    onTaskClick,
+    onTaskOpen,
+}: TaskProps) => {
     // Функция для изменения состояния
     const toggleCheck = () => {
-        setIsChecked(!isChecked)
+        onTaskClick(id)
     }
 
     // Pressable Необходимо, чтобы можно было изменять состояние по клику в любое место в задаче
     // CheckBox Для отметки выполненности
     // Text для отображения текста задачи
     return (
-        <View>
-            <Pressable style={ styles.task } onPress={ toggleCheck }>
-                 <CheckBox
-                     value={ isChecked }
-                     onValueChange={ toggleCheck }
-                 />
-                <Text style={ isChecked ? styles.taskTextCrossed : '' }>
-                   { children }
+        <View style={ styles.task }>
+            <Pressable onPress={ toggleCheck }>
+                <CheckBox
+                    value={ isCompleted }
+                    onValueChange={ toggleCheck }
+                />
+            </Pressable>
+            <Pressable onPress={ () => onTaskOpen(id) }>
+                <Text style={ isCompleted ? styles.taskTextCrossed : styles.taskTextBase }>
+                    { text }
                 </Text>
             </Pressable>
         </View>
@@ -47,7 +62,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 10,
     },
+    taskTextBase: {
+        textAlign: 'justify'
+    },
     taskTextCrossed: {
+        textAlign: 'justify',
         textDecorationLine: 'line-through'
     }
 })
