@@ -84,12 +84,14 @@ const MainScreen = ({
 
     // Функция для добавления новой задачи (статичная)
     const addTask = () => {
+        const newTaskId = tasks.slice(-1).at(0)!.id + 1;
         setTasks([...tasks, {
-            id: tasks.slice(-1).at(0)!.id + 1,
+            id: newTaskId,
             text: "Сделать лабы",
             completed: false,
             notes: "",
         }])
+        navigation.navigate('Task', { taskId: newTaskId })
     }
 
     // Функция для изменения состояния выполненности задачи
