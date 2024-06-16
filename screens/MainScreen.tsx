@@ -4,12 +4,12 @@ import {
     View,
     ScrollView,
     Button,
-    BackHandler,
 } from 'react-native';
-import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Task, { TaskI } from '../components/Task'
 import response from '../response/response';
+import arraysEquality from '../utils/arraysEquality';
+import useInterval from '../hooks/useInterval';
 
 
 interface MainScreenProps {
@@ -31,24 +31,26 @@ const MainScreen = ({
         (async function () {
             await loadDataToStorage(response);
         })();
-        const getDataTimeout = setInterval(async () => await getDataFromStorage(), 1000)
         // Cleanup-функция, срабатывающая при размонтировании компонента.
         // Очищает хранилище
         return () => {
             (async function () {
-                clearInterval(getDataTimeout);
                 await cleanStorage()
             })()
         }
     }, [])
-
+    
     useEffect(() => {
+        // Асинхронная функция, срабатывающая при изменении задач.
+        // Добавляет новые данные в хранилище
         (async function () {
             if (tasks.length > 0) {
                 await setNewDataToStorage()
             }
         })()
     }, [tasks])
+
+    useInterval(async () => await getDataFromStorage(), 1000)
 
     // Функция для загрузки данных в хранилище
     const loadDataToStorage = async (response: { "data": TaskI[] }) => {
@@ -66,7 +68,9 @@ const MainScreen = ({
             const data = await AsyncStorage.getItem('data')
             if (data !== null) {
                 const parsedData = JSON.parse(data)
-                setTasks(parsedData)
+                if (!arraysEquality(tasks, parsedData)) {
+                    setTasks(parsedData)
+                }
             }
         } catch (err) {
             console.log(err)
