@@ -23,13 +23,16 @@ const TaskScreen = ({
     completed: false,
     notes: "",
   })
-
+  
   useEffect(() => {
+    // Самовызывающаяся асинхронная функция, которая извлекает данные
+    // о задаче при запуске этого экрана.
     (async function () {
       await getTaskDataFromStorage();
     })();
   }, [])
 
+  // useEffect, который при изменении состояния задания обновляет хранилище
   useEffect(() => {
     setNewDataToStorage();
   }, [task])
@@ -40,6 +43,7 @@ const TaskScreen = ({
       const data = await AsyncStorage.getItem('data')
       if (data !== null) {
         const parsedData: TaskI[] = JSON.parse(data)
+        // Поиск необходимой задачи среди всех задач по ее id
         const taskData = parsedData.find((taskItem: TaskI) => taskItem.id === taskId)
         if (taskData) {
           setTask(taskData)
@@ -50,6 +54,8 @@ const TaskScreen = ({
     }
   }
 
+  // Функция, обновляющая данные в хранилище в соответствии с обновленным
+  // значением задачи
   const setNewDataToStorage = async () => {
     try {
       const data = await AsyncStorage.getItem('data')
@@ -61,6 +67,8 @@ const TaskScreen = ({
           return 0
         })
 
+        // Построение нового состояния с использованием функции map, применяющей
+        // определенную функцию ко всем элементам списка parsedData
         const newData = parsedData.map((taskItem: TaskI) => {
           if (taskItem.id === taskId) {
             return task
@@ -75,10 +83,12 @@ const TaskScreen = ({
     }
   }
 
+  // Функция, отвечающая за отлов события изменения текста задачи
   const textChangeHandle = (text: string) => {
     setTask({...task, text: text})
   }
-
+  
+  // Функция, отвечающая за отлов события изменения заметок к задаче
   const notesChangeHandle = (text: string) => {
     setTask({...task, notes: text})
   }

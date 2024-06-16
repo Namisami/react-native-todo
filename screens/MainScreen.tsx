@@ -50,6 +50,9 @@ const MainScreen = ({
         })()
     }, [tasks])
 
+    // Кастомный хук, который работает как setInterval, но позволяет
+    // обходить ограничения касательно использования state внутри setInterval.
+    // Обновляет данные в соответствии с хранилищем каждую секунду.
     useInterval(async () => await getDataFromStorage(), 1000)
 
     // Функция для загрузки данных в хранилище
@@ -68,6 +71,8 @@ const MainScreen = ({
             const data = await AsyncStorage.getItem('data')
             if (data !== null) {
                 const parsedData = JSON.parse(data)
+                // Utility-функция, проверяющая, что новые значения
+                // отличаются от предыдущих.
                 if (!arraysEquality(tasks, parsedData)) {
                     setTasks(parsedData)
                 }
