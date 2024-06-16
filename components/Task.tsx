@@ -21,6 +21,7 @@ export interface TaskI {
     text?: string
     completed: boolean
     notes?: string
+    images?: string[]
 }
 
 // Компонент отдельной задачи

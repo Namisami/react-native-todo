@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { View, TextInput, Text, StyleSheet, NativeSyntheticEvent, TextInputChangeEventData } from "react-native";
+import { View, TextInput, Text, StyleSheet, NativeSyntheticEvent, TextInputChangeEventData, Image, Pressable } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import response from "../response/response";
 import { TaskI } from "../components/Task";
@@ -22,6 +22,7 @@ const TaskScreen = ({
     text: "",
     completed: false,
     notes: "",
+    images: [],
   })
   
   useEffect(() => {
@@ -83,6 +84,11 @@ const TaskScreen = ({
     }
   }
 
+  // Функция для изменения состояния выполненности задачи
+  const checkTask = () => {
+    setTask({...task, completed: !task.completed});
+  }
+
   // Функция, отвечающая за отлов события изменения текста задачи
   const textChangeHandle = (text: string) => {
     setTask({...task, text: text})
@@ -109,6 +115,10 @@ const TaskScreen = ({
       >
         {task.notes}
       </TextInput>
+        {/* Иконка, которая меняется в зависимости от выполненности задачи (выполненность можно менять по клику) */}
+      <Pressable style={styles.checkedIconContainer} onPress={ checkTask }>
+        <Image style={styles.checkedIcon} source={ task.completed ? require('../images/checked.png') : require('../images/unchecked.png') }/>
+      </Pressable>
     </View>
   )
 }
@@ -118,6 +128,23 @@ const styles = StyleSheet.create({
     flex: 1,
     marginHorizontal: 16,
     marginVertical: 8,
+  },
+  checkedIcon: {
+    width: 50,
+    height: 50,
+  },
+  checkedIconContainer: {
+    position: 'absolute',
+    bottom: 5,
+    right: 5
+  },
+  imageList: {
+    display: 'flex'
+  },
+  image: {
+    borderRadius: 5,
+    height: 100,
+    width: 100
   },
   notes: {
     marginTop: 16,
