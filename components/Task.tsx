@@ -10,17 +10,17 @@ import CheckBox from '@react-native-community/checkbox';
 
 interface TaskProps {
     id: number
-    text: string
+    text?: string 
     isCompleted: boolean
     onTaskClick: (id: number) => void
     onTaskOpen: (id: number) => void
 }
 
 export interface TaskI {
-    id: number,
-    text: string,
-    completed: boolean,
-    userId: number,
+    id: number
+    text?: string
+    completed: boolean
+    notes?: string
 }
 
 // Компонент отдельной задачи
