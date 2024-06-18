@@ -45,14 +45,10 @@ const TaskScreen = ({
     // Самовызывающаяся асинхронная функция, которая извлекает данные
     // о задаче при запуске этого экрана.
     (async function () {
+      setIsLoading(true);
       await getTaskDataFromStorage();
       setIsLoading(false);
     })();
-    // return () => {
-    //   (async function () {
-    //     await setNewDataToStorage();
-    //   })()
-    // }
   }, [])
 
   // useEffect, который при изменении состояния задания обновляет хранилище
@@ -60,12 +56,6 @@ const TaskScreen = ({
     (async function () {
       await setNewDataToStorage();
     })()
-    // return () => {
-    //   (async function () {
-    //     console.log(task)
-    //     await setNewDataToStorage();
-    //   })()
-    // } 
   }, [task])
 
   // Функция для загрузки данных из хранилища в состояние
@@ -100,6 +90,12 @@ const TaskScreen = ({
 
         // Построение нового состояния с использованием функции map, применяющей
         // определенную функцию ко всем элементам списка parsedData
+        const currentTask = parsedData.find((taskItem: TaskI) => taskItem.id === taskId);
+
+        if (!currentTask) {
+          parsedData.push(task);
+        }
+        
         const newData = parsedData.map((taskItem: TaskI) => {
           if (taskItem.id === taskId) {
             if (task.text !== "") {
@@ -109,13 +105,8 @@ const TaskScreen = ({
           }
           return taskItem
         })
+
         const filteredData = newData.filter((taskItem: TaskI | null) => taskItem !== null)
-
-        const currentTask = filteredData.find((taskItem: TaskI) => taskItem.id === taskId);
-
-        if (!currentTask) {
-          filteredData.push(task);
-        }
 
         await AsyncStorage.setItem("data", JSON.stringify(filteredData))
       }
@@ -140,7 +131,7 @@ const TaskScreen = ({
   }
 
   return (
-    <View style={styles.container}>
+    <View style={{...styles.container, backgroundColor: theme.colors.background}}>
       { isLoading 
         ? <Icon source="loading" size={ 20 }/>  
         : <>
@@ -164,7 +155,7 @@ const TaskScreen = ({
             <Button 
               style={{...styles.checkedIconContainer, borderColor: theme.colors.primary}} 
               icon="check"
-              textColor="black"
+              textColor={ theme.dark ? "white" : "black"}
               mode={ task.completed ? "contained" : "outlined"}
               onPress={ checkTask }
             >
@@ -182,8 +173,8 @@ const TaskScreen = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginHorizontal: 16,
-    marginVertical: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
   },
   checkedIcon: {
     width: 50,
@@ -192,8 +183,8 @@ const styles = StyleSheet.create({
   checkedIconContainer: {
     borderWidth: 1,
     position: 'absolute',
-    bottom: 2,
-    right: -6,
+    bottom: 10,
+    right: 10,
   },
   imageList: {
     display: 'flex'
