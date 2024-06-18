@@ -3,9 +3,10 @@ import {
     StyleSheet,
     View,
     ScrollView,
-    Button,
+    // Button,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTheme, Button } from 'react-native-paper';
 import Task, { TaskI } from '../components/Task'
 import response from '../response/response';
 import arraysEquality from '../utils/arraysEquality';
@@ -23,6 +24,9 @@ const MainScreen = ({
 }: MainScreenProps) => {
     // Объявление хранилища задач с использованием хука useState
     const [tasks, setTasks] = useState<TaskI[]>([])
+
+    // Получение темы через хук
+    const theme = useTheme();
 
     useEffect(() => {
         // Асинхронная функция, запускающаяся при монтировании приложения
@@ -94,12 +98,12 @@ const MainScreen = ({
     // Функция для добавления новой задачи (статичная)
     const addTask = () => {
         const newTaskId = tasks.slice(-1).at(0)!.id + 1;
-        setTasks([...tasks, {
-            id: newTaskId,
-            text: "Сделать лабы",
-            completed: false,
-            notes: "",
-        }])
+        // setTasks([...tasks, {
+        //     id: newTaskId,
+        //     text: "",
+        //     completed: false,
+        //     notes: "",
+        // }])
         navigation.navigate('Task', { taskId: newTaskId })
     }
 
@@ -115,13 +119,15 @@ const MainScreen = ({
     }
 
     return (
-        <View style={styles.container}>
-            <View>
-                <Button
-                    title="Создать"
-                    onPress={addTask}
-                />
-            </View>
+        <View style={{...styles.container, backgroundColor: theme.colors.background}}>
+            <Button
+                icon="plus"
+                mode="contained-tonal"
+                style={ styles.addBtn }
+                onPress={addTask}
+            >
+                Создать
+            </Button>
             <ScrollView style={styles.taskList} contentContainerStyle={{ gap: 8 }}>
                 {
                     tasks.map((item: TaskI) => <Task key={item.id}
@@ -140,12 +146,19 @@ const MainScreen = ({
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        marginHorizontal: 16,
-        marginVertical: 8,
+        paddingHorizontal: 16,
+        paddingVertical: 8,
+        // marginHorizontal: 16,
+        // marginVertical: 8,
     },
     taskList: {
-        marginTop: 16,
-    }
+    },
+    addBtn: {
+        position: 'absolute',
+        zIndex: 1000,
+        bottom: 10,
+        right: 10,
+    },
 });
 
 export default MainScreen

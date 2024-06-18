@@ -3,9 +3,9 @@ import {
     Pressable,
     StyleSheet,
     View,
-    Text,
 } from 'react-native';
-import CheckBox from '@react-native-community/checkbox';
+import { Checkbox, Text } from 'react-native-paper';
+// import CheckBox from '@react-native-community/checkbox';
 
 
 interface TaskProps {
@@ -43,13 +43,13 @@ const Task = ({
     return (
         <View style={ styles.task }>
             <Pressable onPress={ toggleCheck }>
-                <CheckBox
-                    value={ isCompleted }
-                    onValueChange={ toggleCheck }
+                <Checkbox
+                    status={ isCompleted ? 'checked' : 'unchecked' }
+                    onPress={ toggleCheck }
                 />
             </Pressable>
             <Pressable onPress={ () => onTaskOpen(id) }>
-                <Text style={ isCompleted ? styles.taskTextCrossed : styles.taskTextBase }>
+                <Text variant='bodyMedium' style={ isCompleted ? styles.taskTextCrossed : styles.taskTextBase }>
                     { text }
                 </Text>
             </Pressable>

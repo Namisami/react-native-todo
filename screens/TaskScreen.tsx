@@ -1,7 +1,17 @@
 import { useEffect, useState } from "react";
-import { View, TextInput, Text, StyleSheet, NativeSyntheticEvent, TextInputChangeEventData, Image, Pressable } from "react-native";
+import { 
+  View,  
+  StyleSheet, 
+  Image, 
+  Pressable 
+} from "react-native";
+import { 
+  Button,
+  TextInput,
+  Icon,
+  useTheme
+} from "react-native-paper";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import response from "../response/response";
 import { TaskI } from "../components/Task";
 
 
@@ -24,18 +34,38 @@ const TaskScreen = ({
     notes: "",
     images: [],
   })
+
+  // Загружаются ли данные
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Получение темы через хук
+  const theme = useTheme();
   
   useEffect(() => {
     // Самовызывающаяся асинхронная функция, которая извлекает данные
     // о задаче при запуске этого экрана.
     (async function () {
       await getTaskDataFromStorage();
+      setIsLoading(false);
     })();
+    // return () => {
+    //   (async function () {
+    //     await setNewDataToStorage();
+    //   })()
+    // }
   }, [])
 
   // useEffect, который при изменении состояния задания обновляет хранилище
   useEffect(() => {
-    setNewDataToStorage();
+    (async function () {
+      await setNewDataToStorage();
+    })()
+    // return () => {
+    //   (async function () {
+    //     console.log(task)
+    //     await setNewDataToStorage();
+    //   })()
+    // } 
   }, [task])
 
   // Функция для загрузки данных из хранилища в состояние
@@ -71,13 +101,21 @@ const TaskScreen = ({
         // Построение нового состояния с использованием функции map, применяющей
         // определенную функцию ко всем элементам списка parsedData
         const newData = parsedData.map((taskItem: TaskI) => {
+          // console.log(taskItem, taskId)
           if (taskItem.id === taskId) {
-            return task
+            console.log(task)
+            if (task.text !== "") {
+              console.log('SUCCESSS')
+              console.log(task)
+              return task
+            }
+            return null
           }
           return taskItem
         })
+        const filteredData = newData.filter((taskItem: TaskI | null) => taskItem !== null)
 
-        await AsyncStorage.setItem("data", JSON.stringify(newData))
+        await AsyncStorage.setItem("data", JSON.stringify(filteredData))
       }
     } catch (err) {
       console.log(err)
@@ -101,24 +139,40 @@ const TaskScreen = ({
 
   return (
     <View style={styles.container}>
-      <Text>Задача</Text>
-      <TextInput 
-        placeholder="Введите задачу"
-        onChangeText={ textChangeHandle }
-      >
-        {task.text}
-      </TextInput>
-      <Text style={styles.notes}>Замечания</Text>
-      <TextInput 
-        placeholder="Введите замечания"
-        onChangeText={ notesChangeHandle }
-      >
-        {task.notes}
-      </TextInput>
-        {/* Иконка, которая меняется в зависимости от выполненности задачи (выполненность можно менять по клику) */}
-      <Pressable style={styles.checkedIconContainer} onPress={ checkTask }>
-        <Image style={styles.checkedIcon} source={ task.completed ? require('../images/checked.png') : require('../images/unchecked.png') }/>
-      </Pressable>
+      { isLoading 
+        ? <Icon source="loading" size={ 20 }/>  
+        : <>
+            <TextInput 
+              mode="outlined"
+              label="Название"
+              placeholder="Введите задачу"
+              value={task.text}
+              onChangeText={ textChangeHandle }
+            />
+            <TextInput
+              multiline
+              style={styles.notes} 
+              mode="outlined"
+              label="Заметки"
+              placeholder="Введите заметки"
+              value={task.notes}
+              onChangeText={ notesChangeHandle }
+            />
+              {/* Иконка, которая меняется в зависимости от выполненности задачи (выполненность можно менять по клику) */}
+            <Button 
+              style={{...styles.checkedIconContainer, borderColor: theme.colors.primary}} 
+              icon="check"
+              textColor="black"
+              mode={ task.completed ? "contained" : "outlined"}
+              onPress={ checkTask }
+            >
+              Готово
+            </Button>
+            {/* <Pressable style={styles.checkedIconContainer} onPress={ checkTask }>
+              <Image style={styles.checkedIcon} source={ task.completed ? require('../images/checked.png') : require('../images/unchecked.png') }/>
+            </Pressable> */}
+          </>
+      }
     </View>
   )
 }
@@ -134,9 +188,10 @@ const styles = StyleSheet.create({
     height: 50,
   },
   checkedIconContainer: {
+    borderWidth: 1,
     position: 'absolute',
-    bottom: 5,
-    right: 5
+    bottom: 2,
+    right: -6,
   },
   imageList: {
     display: 'flex'
@@ -147,7 +202,9 @@ const styles = StyleSheet.create({
     width: 100
   },
   notes: {
+    paddingTop: 0,
     marginTop: 16,
+    height: 256,
   }
 });
 
