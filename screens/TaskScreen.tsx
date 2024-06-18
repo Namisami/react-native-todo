@@ -101,12 +101,8 @@ const TaskScreen = ({
         // Построение нового состояния с использованием функции map, применяющей
         // определенную функцию ко всем элементам списка parsedData
         const newData = parsedData.map((taskItem: TaskI) => {
-          // console.log(taskItem, taskId)
           if (taskItem.id === taskId) {
-            console.log(task)
             if (task.text !== "") {
-              console.log('SUCCESSS')
-              console.log(task)
               return task
             }
             return null
@@ -114,6 +110,12 @@ const TaskScreen = ({
           return taskItem
         })
         const filteredData = newData.filter((taskItem: TaskI | null) => taskItem !== null)
+
+        const currentTask = filteredData.find((taskItem: TaskI) => taskItem.id === taskId);
+
+        if (!currentTask) {
+          filteredData.push(task);
+        }
 
         await AsyncStorage.setItem("data", JSON.stringify(filteredData))
       }
@@ -202,9 +204,7 @@ const styles = StyleSheet.create({
     width: 100
   },
   notes: {
-    paddingTop: 0,
     marginTop: 16,
-    height: 256,
   }
 });
 
