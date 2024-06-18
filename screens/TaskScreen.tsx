@@ -35,7 +35,7 @@ const TaskScreen = ({
     images: [],
   })
 
-  // Загружаются ли данные
+  // Состояние, показывающее, загружаются ли данные
   const [isLoading, setIsLoading] = useState(true);
 
   // Получение темы через хук
@@ -87,15 +87,17 @@ const TaskScreen = ({
           if (a.id > b.id) return 1
           return 0
         })
-
-        // Построение нового состояния с использованием функции map, применяющей
-        // определенную функцию ко всем элементам списка parsedData
+        
         const currentTask = parsedData.find((taskItem: TaskI) => taskItem.id === taskId);
 
+        // Проверка, есть ли новая задача в списке задач
+        // Если нет, то добавляет
         if (!currentTask) {
           parsedData.push(task);
         }
-        
+
+        // Построение нового состояния с использованием функции map, применяющей
+        // определенную функцию ко всем элементам списка parsedData
         const newData = parsedData.map((taskItem: TaskI) => {
           if (taskItem.id === taskId) {
             if (task.text !== "") {
@@ -106,6 +108,8 @@ const TaskScreen = ({
           return taskItem
         })
 
+        // Применение отсеивания нулевых значений, которые могут возникнуть
+        // в результате применения функции map выше
         const filteredData = newData.filter((taskItem: TaskI | null) => taskItem !== null)
 
         await AsyncStorage.setItem("data", JSON.stringify(filteredData))

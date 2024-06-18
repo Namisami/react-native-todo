@@ -10,18 +10,20 @@ import {
 import MainScreen from './screens/MainScreen';
 import TaskScreen from './screens/TaskScreen';
 
+// Stack, необходимый для навигации
 const Stack = createNativeStackNavigator();
 
+// Стандартная цветовая схема темы
 const commonTheme = {
     ...DefaultTheme,
     colors: {
         ...DefaultTheme.colors,
         primary: '#9DC8FF',
         secondary: '#264F85',
-        background: '#FFFFFF',
     },
 };
 
+// Темная цветовая схема темы
 const darkTheme = {
     ...DarkTheme,
     dark: true,
@@ -29,13 +31,14 @@ const darkTheme = {
         ...DarkTheme.colors,
         primary: '#9DC8FF',
         secondary: '#264F85',
-        // background: '#FFFFFF',
     },
 };
 
 const App = () => {
+    // Значение состояния, отвечающее за то, какая тема стоит в приложении
     const [theme, setTheme] = useState<'light' | 'dark'>('light');
-
+        
+    // Функция переключения темы в приложении
     const toggleTheme = () => {
         if (theme === 'light') {
             setTheme('dark');

@@ -5,7 +5,6 @@ import {
     View,
 } from 'react-native';
 import { Checkbox, Text } from 'react-native-paper';
-// import CheckBox from '@react-native-community/checkbox';
 
 
 interface TaskProps {

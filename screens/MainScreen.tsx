@@ -86,6 +86,7 @@ const MainScreen = ({
         }
     }
 
+    // Функция замены данных в хранилище на новые
     const setNewDataToStorage = async () => {
         await AsyncStorage.setItem("data", JSON.stringify(tasks))
     }
@@ -142,8 +143,6 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingHorizontal: 16,
         paddingVertical: 8,
-        // marginHorizontal: 16,
-        // marginVertical: 8,
     },
     taskList: {
     },
