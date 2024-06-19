@@ -47,7 +47,10 @@ const Task = ({
                     onPress={ toggleCheck }
                 />
             </Pressable>
-            <Pressable onPress={ () => onTaskOpen(id) }>
+            <Pressable
+                style={styles.taskTextLink}
+                onPress={ () => onTaskOpen(id) }
+            >
                 <Text variant='bodyMedium' style={ isCompleted ? styles.taskTextCrossed : styles.taskTextBase }>
                     { text }
                 </Text>
@@ -62,10 +65,17 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 10,
     },
+    taskTextLink: {
+        flex: 1,
+    },
     taskTextBase: {
+        flex: 1,
+        verticalAlign: 'middle',
         textAlign: 'justify'
     },
     taskTextCrossed: {
+        flex: 1,
+        verticalAlign: 'middle',
         textAlign: 'justify',
         textDecorationLine: 'line-through'
     }
