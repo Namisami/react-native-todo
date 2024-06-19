@@ -3,10 +3,10 @@ import {
     StyleSheet,
     View,
     ScrollView,
-    // Button,
+    Platform,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useTheme, Button } from 'react-native-paper';
+import { useTheme, Button, Snackbar } from 'react-native-paper';
 import Task, { TaskI } from '../components/Task'
 import response from '../response/response';
 import arraysEquality from '../utils/arraysEquality';
@@ -24,6 +24,10 @@ const MainScreen = ({
 }: MainScreenProps) => {
     // Объявление хранилища задач с использованием хука useState
     const [tasks, setTasks] = useState<TaskI[]>([])
+    // Объявление временного хранилища задач с использованием хука useState
+    const [tempTasks, setTempTasks] = useState<TaskI[]>([])
+    // Состояние, показывающее видно ли снэкбар
+    const [isSnackbarVisible, setIsSnackbarVisible] = useState(false);
 
     // Получение темы через хук
     const theme = useTheme();
@@ -78,6 +82,9 @@ const MainScreen = ({
                 // Utility-функция, проверяющая, что новые значения
                 // отличаются от предыдущих.
                 if (!arraysEquality(tasks, parsedData)) {
+                    if (parsedData.length < tasks.length) {
+                        setIsSnackbarVisible(true)
+                    }
                     setTasks(parsedData)
                 }
             }
@@ -113,8 +120,25 @@ const MainScreen = ({
         setTasks(newTasks);
     }
 
+    // Функция, которая отвечает за отключение видимости снэкбара
+    const onSnackBarDismiss = () => {
+        setIsSnackbarVisible(false);
+    }
+
+    // Функция, отменяющая удаление задачи
+    const returnDeletedTask = () => {
+        setTasks(tempTasks)
+    }
+
+    // Функция, открывающая отдельный экран с подробно описаннной задачей
+    // Сохраняет состояние задач на время открытия.
+    const openTaskScreen = (id: number) => {
+        setTempTasks(tasks)
+        navigation.navigate('Task', { taskId: id })
+    }
+
     return (
-        <View style={{...styles.container, backgroundColor: theme.colors.background}}>
+        <View style={styles.screen}>
             <Button
                 icon="plus"
                 mode="contained-tonal"
@@ -123,22 +147,42 @@ const MainScreen = ({
             >
                 Создать
             </Button>
-            <ScrollView style={styles.taskList} contentContainerStyle={{ gap: 8 }}>
-                {
-                    tasks.map((item: TaskI) => <Task key={item.id}
-                        id={item.id}
-                        text={item.text}
-                        isCompleted={item.completed}
-                        onTaskClick={checkTask}
-                        onTaskOpen={(id) => navigation.navigate('Task', { taskId: id })}
-                    />)
-                }
-            </ScrollView>
+            <View style={{...styles.container, backgroundColor: theme.colors.background}}>
+                <ScrollView style={styles.taskList} contentContainerStyle={{ gap: 8 }}>
+                    {
+                        tasks.map((item: TaskI) => <Task key={item.id}
+                            id={item.id}
+                            text={item.text}
+                            isCompleted={item.completed}
+                            onTaskClick={checkTask}
+                            onTaskOpen={(id) => openTaskScreen(id)}
+                        />)
+                    }
+                </ScrollView>
+            </View>
+            {/* Использует снэкбар, если устройство пользователя - Android */}
+            { Platform.OS === 'android' && 
+                <Snackbar
+                    style={styles.snackbar}
+                    icon='close'
+                    visible={isSnackbarVisible}
+                    onDismiss={ onSnackBarDismiss }
+                    action={{
+                        label: "Отменить",
+                        onPress: returnDeletedTask
+                    }}
+                >
+                    Задача была удалена
+                </Snackbar>
+            }
         </View>
     )
 }
 
 const styles = StyleSheet.create({
+    screen: {
+        flex: 1,
+    },
     container: {
         flex: 1,
         paddingHorizontal: 16,
@@ -148,10 +192,13 @@ const styles = StyleSheet.create({
     },
     addBtn: {
         position: 'absolute',
-        zIndex: 1000,
+        zIndex: 2,
         bottom: 10,
         right: 10,
     },
+    snackbar: {
+        zIndex: 1000,
+    }
 });
 
 export default MainScreen
