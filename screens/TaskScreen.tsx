@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 import { 
   View,  
   StyleSheet, 
-  Image, 
-  Pressable 
 } from "react-native";
 import { 
   Button,
@@ -12,6 +10,10 @@ import {
   useTheme
 } from "react-native-paper";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import getTaskDataFromStorage from "../api/getTaskDataFromStorage";
+import setNewDataToStorage from "../api/setNewDataToStorage";
+
 import { TaskI } from "../components/Task";
 
 
@@ -32,7 +34,6 @@ const TaskScreen = ({
     text: "",
     completed: false,
     notes: "",
-    images: [],
   })
 
   // Состояние, показывающее, загружаются ли данные
@@ -46,7 +47,7 @@ const TaskScreen = ({
     // о задаче при запуске этого экрана.
     (async function () {
       setIsLoading(true);
-      await getTaskDataFromStorage();
+      await setTaskData();
       setIsLoading(false);
     })();
   }, [])
@@ -54,30 +55,21 @@ const TaskScreen = ({
   // useEffect, который при изменении состояния задания обновляет хранилище
   useEffect(() => {
     (async function () {
-      await setNewDataToStorage();
+      await setNewDataToStorageCall();
     })()
   }, [task])
 
   // Функция для загрузки данных из хранилища в состояние
-  const getTaskDataFromStorage = async () => {
-    try {
-      const data = await AsyncStorage.getItem('data')
-      if (data !== null) {
-        const parsedData: TaskI[] = JSON.parse(data)
-        // Поиск необходимой задачи среди всех задач по ее id
-        const taskData = parsedData.find((taskItem: TaskI) => taskItem.id === taskId)
-        if (taskData) {
-          setTask(taskData)
-        }
-      }
-    } catch (err) {
-      console.log(err)
+  const setTaskData = async () => {
+    const taskData = await getTaskDataFromStorage(taskId);
+    if (taskData) {
+      setTask(taskData)
     }
   }
 
   // Функция, обновляющая данные в хранилище в соответствии с обновленным
   // значением задачи
-  const setNewDataToStorage = async () => {
+  const setNewDataToStorageCall = async () => {
     try {
       const data = await AsyncStorage.getItem('data')
       if (data !== null) {
@@ -112,7 +104,7 @@ const TaskScreen = ({
         // в результате применения функции map выше
         const filteredData = newData.filter((taskItem: TaskI | null) => taskItem !== null)
 
-        await AsyncStorage.setItem("data", JSON.stringify(filteredData))
+        await setNewDataToStorage(filteredData);
       }
     } catch (err) {
       console.log(err)

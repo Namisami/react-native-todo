@@ -8,7 +8,13 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme, Button, Snackbar } from 'react-native-paper';
 import Task, { TaskI } from '../components/Task'
-import response from '../response/response';
+
+import response from '../api/response';
+import loadDataToStorage from '../api/loadDataToStorage';
+import getDataFromStorage from '../api/getDataFromStorage';
+import setNewDataToStorage from '../api/setNewDataToStorage';
+import cleanStorage from '../api/cleanStorage';
+
 import arraysEquality from '../utils/arraysEquality';
 import useInterval from '../hooks/useInterval';
 
@@ -52,55 +58,26 @@ const MainScreen = ({
         // Асинхронная функция, срабатывающая при изменении задач.
         // Добавляет новые данные в хранилище
         (async function () {
-            if (tasks.length > 0) {
-                await setNewDataToStorage()
-            }
+            await setNewDataToStorage(tasks)
         })()
     }, [tasks])
 
     // Кастомный хук, который работает как setInterval, но позволяет
     // обходить ограничения касательно использования state внутри setInterval.
     // Обновляет данные в соответствии с хранилищем каждую секунду.
-    useInterval(async () => await getDataFromStorage(), 1000)
-
-    // Функция для загрузки данных в хранилище
-    const loadDataToStorage = async (response: { "data": TaskI[] }) => {
-        try {
-            const data = JSON.stringify(response.data)
-            await AsyncStorage.setItem('data', data)
-        } catch (err) {
-            console.log(err)
-        }
-    }
+    useInterval(async () => await setTasksFromStorage(), 1000)
 
     // Функция для загрузки данных из хранилища в состояние
-    const getDataFromStorage = async () => {
-        try {
-            const data = await AsyncStorage.getItem('data')
-            if (data !== null) {
-                const parsedData = JSON.parse(data)
-                // Utility-функция, проверяющая, что новые значения
-                // отличаются от предыдущих.
-                if (!arraysEquality(tasks, parsedData)) {
-                    if (parsedData.length < tasks.length) {
-                        setIsSnackbarVisible(true)
-                    }
-                    setTasks(parsedData)
-                }
+    const setTasksFromStorage = async () => {
+        const parsedData = await getDataFromStorage();
+        // Utility-функция, проверяющая, что новые значения
+        // отличаются от предыдущих.
+        if (!arraysEquality(tasks, parsedData)) {
+            if (parsedData.length < tasks.length) {
+                setIsSnackbarVisible(true)
             }
-        } catch (err) {
-            console.log(err)
+            setTasks(parsedData)
         }
-    }
-
-    // Функция замены данных в хранилище на новые
-    const setNewDataToStorage = async () => {
-        await AsyncStorage.setItem("data", JSON.stringify(tasks))
-    }
-
-    // Функция для очистки хранилища
-    const cleanStorage = async () => {
-        await AsyncStorage.removeItem("data")
     }
 
     // Функция для добавления новой задачи (статичная)
